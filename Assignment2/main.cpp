@@ -25,13 +25,50 @@ Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos)
 Eigen::Matrix4f get_model_matrix(float rotation_angle)
 {
     Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
+
+    Eigen::Matrix4f translate = Eigen::Matrix4f::Identity();
+    float radian = (rotation_angle * MY_PI) /180.f;
+    translate << cos(radian),-sin(radian),0,0,
+                sin(radian),cos(radian),0,0,
+                0,0,1,0,
+                0,0,0,1;
+
+    model = translate * model;
     return model;
 }
 
 Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio, float zNear, float zFar)
 {
-    // TODO: Copy-paste your implementation from the previous assignment.
     Eigen::Matrix4f projection;
+    Eigen::Matrix4f OrthoTranslate = Eigen::Matrix4f::Identity();
+    Eigen::Matrix4f PerspTranslate = Eigen::Matrix4f::Identity();
+
+    float radian = (eye_fov * 0.5f * MY_PI) / 180.f;
+
+    PerspTranslate << zNear,0,0,0,
+                        0,zNear,0,0,
+                        0,0,zNear + zFar, (-1) * zFar * zNear,
+                        0,0,1,0;
+
+    Eigen::Matrix4f NormalTranslate = Eigen::Matrix4f::Identity();
+    Eigen::Matrix4f ScaleTranslate = Eigen::Matrix4f::Identity();
+    float t = zNear * tan(radian);
+    float r = t * aspect_ratio;
+    float l = -r;
+    float b = -t;
+
+    NormalTranslate << 1,0,0,(-1)* (r+l)/2,
+                        0,1,0,(-1)* (t+b)/2,
+                        0,0,1,(-1)* (zNear+zFar)/2,
+                        0,0,0,1;
+    ScaleTranslate << 2/(r-l),0,0,0,
+                        0,2/(t-b),0,0,
+                        0,0,2/(zNear -zFar),0,
+                        0,0,0,1;
+
+    OrthoTranslate <<ScaleTranslate * NormalTranslate;
+
+    projection = OrthoTranslate * PerspTranslate;
 
     return projection;
 }
