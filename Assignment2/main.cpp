@@ -26,14 +26,14 @@ Eigen::Matrix4f get_model_matrix(float rotation_angle)
 {
     Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
 
-    Eigen::Matrix4f translate = Eigen::Matrix4f::Identity();
-    float radian = (rotation_angle * MY_PI) /180.f;
-    translate << cos(radian),-sin(radian),0,0,
-                sin(radian),cos(radian),0,0,
-                0,0,1,0,
-                0,0,0,1;
+    // Eigen::Matrix4f translate = Eigen::Matrix4f::Identity();
+    // float radian = (rotation_angle * MY_PI) /180.f;
+    // translate << cos(radian),-sin(radian),0,0,
+    //             sin(radian),cos(radian),0,0,
+    //             0,0,1,0,
+    //             0,0,0,1;
 
-    model = translate * model;
+    // model = translate * model;
     return model;
 }
 
@@ -66,9 +66,9 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio, float z
                         0,0,2/(zNear -zFar),0,
                         0,0,0,1;
 
-    OrthoTranslate <<ScaleTranslate * NormalTranslate;
+    OrthoTranslate = NormalTranslate * ScaleTranslate ;
 
-    projection = OrthoTranslate * PerspTranslate;
+    projection =  OrthoTranslate * PerspTranslate;
 
     return projection;
 }
