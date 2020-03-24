@@ -136,20 +136,9 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
     {
        Minvertical  = std::min(Minvertical,it.x());
        Minhorizatal = std::min(Minhorizatal,it.y());
-
-      Maxvertical   = std::max(Maxvertical,it.x());
-      Maxhorizatal  = std::max(Maxhorizatal,it.y());
-
-        std::cout << " Minvertical: " << Minvertical << '\n';
-        std::cout << " Minhorizatal: " << Minhorizatal << '\n';
-        std::cout << " Minvertical: " << Minvertical << '\n';
-        std::cout << " Minvertical: " << Minvertical << '\n';
+       Maxvertical   = std::max(Maxvertical,it.x());
+       Maxhorizatal  = std::max(Maxhorizatal,it.y());
     }
-    // int Minvertical = MIN(floor(v[0].x()),MIN(floor(v[1].x()),floor(v[2].x())));
-    // int Maxvertical = MAX(ceil(v[0].x()),MAX(ceil(v[1].x()),ceil(v[2].x())));
-    // int Minhorizatal = MIN(floor(v[0].y()),MIN(floor(v[1].y()),floor(v[2].y())));;
-    // int Maxhorizatal = MAX(ceil(v[0].y()),MAX(ceil(v[1].y()),ceil(v[2].y())));;
-
 
     for (int i = Minvertical; i <Maxvertical ; i++)
     {
