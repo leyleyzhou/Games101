@@ -104,17 +104,43 @@ Intersection BVHAccel::Intersect(const Ray& ray) const
 
 Intersection BVHAccel::getIntersection(BVHBuildNode* node, const Ray& ray) const
 {
+    Intersection isect;
     // TODO Traverse the BVH to find intersection
-    std::array<int, 3> dirisNeg = {int(ray.direction.x >0),int(ray.direction.y>0),int(ray.direction.z>0)};
-    Intersection inter;
-    if(node->bounds.IntersectP(ray,Vector3f(1.0f/ray.direction.x,1.0f/ray.direction.y,1.0f/ray.direction.z),dirisNeg) == false) 
-    return Intersection();
-    if(node->left == nullptr && node->right == nullptr)
-        return node->object->getIntersection(ray);
-    Intersection hit1;
-    Intersection hit2;
-    hit1 = getIntersection(node->left,ray);
-    hit2 = getIntersection(node->right,ray);
-
-    return (hit1.distance < hit2.distance)?hit1:hit2;
+    // auto invDir = Vector3f(
+    //     1.0/ray.direction.x, 
+    //     1.0/ray.direction.y, 
+    //     1.0/ray.direction.z
+    // );
+    auto dirIsNeg = std::array<int, 3> {{
+        int(ray.direction.x>0),
+        int(ray.direction.y>0),
+        int(ray.direction.z>0), 
+    }};
+    // check if ray miss the bound
+    bool interNode = node->bounds.IntersectP(ray, ray.direction_inv, dirIsNeg);
+    if (interNode)
+    {
+        // leaf node reached, which contains only one object
+        if ((node->left==nullptr) && (node->right==nullptr))
+        {
+            isect = node->object->getIntersection(ray);
+        }
+        // leaf node not reached, recursively call the leaf
+        else
+        {
+            auto isectLeft = getIntersection(node->left, ray);
+            auto isectRight = getIntersection(node->right, ray);
+            // closest distance
+            if (isectLeft.distance < isectRight.distance)
+            {
+                isect = isectLeft;
+            }
+            else
+            {
+                isect = isectRight;
+            }            
+        }
+    }
+    
+    return isect;
 }

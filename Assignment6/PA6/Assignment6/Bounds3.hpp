@@ -96,26 +96,36 @@ inline bool Bounds3::IntersectP(const Ray& ray, const Vector3f& invDir,
     // invDir: ray direction(x,y,z), invDir=(1.0/x,1.0/y,1.0/z), use this because Multiply is faster that Division
     // dirIsNeg: ray direction(x,y,z), dirIsNeg=[int(x>0),int(y>0),int(z>0)], use this to simplify your logic
     // TODO test if ray bound intersects
-     //t  = (px - ox) / dx
-    double t1 = 0;
-    double t2 = 0;
-    t1 = (pMin.x - ray.origin.x) * invDir.x;
-    t2 = (pMax.x - ray.origin.x) * invDir.x;
-    double txmin = (dirIsNeg[0]>0)?t1:t2;
-    double txmax = (dirIsNeg[0]>0)?t2:t1;
-    t1 = (pMin.y - ray.origin.y) * invDir.y;
-    t2 = (pMax.y - ray.origin.y) * invDir.y;
-    double tymin = (dirIsNeg[1]>0)?t1:t2;
-    double tymax = (dirIsNeg[1]>0)?t2:t1;
-    t1 = (pMin.z - ray.origin.z) * invDir.z;
-    t2 = (pMax.z - ray.origin.z) * invDir.z;
-    double tzmin = (dirIsNeg[2]>0)?t1:t2;
-    double tzmax = (dirIsNeg[2]>0)?t2:t1;
+
+    // t_min & t_max along x/y/z-axis
+    auto t_pmax = (pMax - ray.origin) * invDir;
+    auto t_pmin = (pMin - ray.origin) * invDir;
     
-    if(std::max(std::max(txmin,tymin),tzmin) < std::min(std::min(txmax,tymax),tzmax) && std::min(std::min(txmax,tymax),tzmax))
-    return true;
-    else
-    return false;
+    // USER_NOTE: need to shuffle min & max
+    Vector3f t_min(
+        std::min(t_pmin.x, t_pmax.x),
+        std::min(t_pmin.y, t_pmax.y),
+        std::min(t_pmin.z, t_pmax.z)
+        );
+    Vector3f t_max(
+        std::max(t_pmin.x, t_pmax.x),
+        std::max(t_pmin.y, t_pmax.y),
+        std::max(t_pmin.z, t_pmax.z)
+        );
+
+    auto t_enter = std::max({t_min.x, t_min.y, t_min.z});
+    auto t_exit  = std::min({t_max.x, t_max.y, t_max.z});
+    bool inter = (t_exit>t_enter) && (t_exit>0);
+
+    // std::clog << "pMin: " << pMin << " " << "pMax: " << pMax << std::endl;
+    // std::clog << "ray: " << ray;
+    // std::clog << "invDir: " << invDir << std::endl;
+    // std::clog << "t_min: " << t_min << " " << "t_max: " << t_max << std::endl << std::endl;
+    // std::clog << "t_enter: " << t_enter << " " << "t_exit: " << t_exit << std::endl << std::endl;
+    // std::clog << "inter" << inter << std::endl;
+
+
+    return inter;
 }
 
 inline Bounds3 Union(const Bounds3& b1, const Bounds3& b2)

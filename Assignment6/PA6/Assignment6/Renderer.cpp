@@ -33,11 +33,16 @@ void Renderer::Render(const Scene& scene)
             //  vector that passes through it.
             // Also, don't forget to multiply both of them with the variable
             // *scale*, and x (horizontal) variable with the *imageAspectRatio*
-            
+
             // Don't forget to normalize this direction!
-            Vector3f dir = Vector3f(x, y, -1) - eye_pos; 
-            dir = normalize(dir);
-            framebuffer[m++] = scene.castRay(Ray(eye_pos, dir),0.0f);
+
+            Vector3f dir = Vector3f(x, y, -1); // Don't forget to normalize this direction!
+            dir = normalize(dir);  // normalization
+            Ray ray = Ray(eye_pos, dir, 0.0);  // create ray
+            framebuffer[m++] = scene.castRay(ray, 0);  // cast ray
+
+            // std::clog << "x: " << x << "y: " << y << std::endl;
+            // std::clog << framebuffer[m-1] << std::endl;
         }
         UpdateProgress(j / (float)scene.height);
     }
